@@ -23,6 +23,7 @@ const uploadOnCloudinary = async (localFilePath) => {
             throw new Error("Upload failed")
         }
         console.log(result.secure_url)
+        fs.unlinkSync(localFilePath)
         return result;
 
     }

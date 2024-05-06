@@ -5,27 +5,25 @@ const bcrypt = require("bcryptjs");
 const Category = require("../models/categoryModel");
 const uploadOnCloudinary = require("../utils/cloudinary");
 
-const fs = require('fs');
-const path = require('path');
-const multer = require('multer');
 
-// module.exports.register = async (req, res) => {
-//     const { username, email, password } = req.body;
-//     if(!username || !email || !password) {
-//         throw new ExpressError("All fields are required", 400);
-//     }
-//     const admin = await Admin.findOne({email});
-//     if(admin) {
-//         throw new ExpressError("Admin already exists", 400);
-//     }
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(password, salt);
-//     const newAdmin = new Admin({ username, email, password: hashedPassword });
-//     await newAdmin.save();
-//     const token = jwt.sign({ id: newAdmin._id }, process.env.ADMIN_SECRET);
-//     res.status(201).json({ token });
+
+module.exports.register = async (req, res) => {
+    const { username, email, password } = req.body;
+    if(!username || !email || !password) {
+        throw new ExpressError("All fields are required", 400);
+    }
+    const admin = await Admin.findOne({email});
+    if(admin) {
+        throw new ExpressError("Admin already exists", 400);
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const newAdmin = new Admin({ username, email, password: hashedPassword });
+    await newAdmin.save();
+    // const token = jwt.sign({ id: newAdmin._id }, process.env.ADMIN_SECRET);
+    res.status(200).json({ message: "Admin registered successfully" });
     
-// }
+}
 
 
 module.exports.login = async (req, res) => {
@@ -145,8 +143,10 @@ module.exports.deleteCategory = async (req, res) => {
 
 
 module.exports.uploadResume = async (req, res, next) => {
-    console.log(req.files);
-    const resumeLocalPath = req.files?.resume.path;
+    console.log("In uploadResume");
+    // console.log(req.file);
+    console.log(req.file?.path);
+    const resumeLocalPath = req.file?.path;
     if(!resumeLocalPath) {
         return res.status(400).json({ message: 'Resume not uploaded' });
     }

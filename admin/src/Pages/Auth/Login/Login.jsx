@@ -24,40 +24,45 @@ const Login = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();  
-    const response = await axios.post('/admin/login', {
-      email,
-      password
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    });
-
-    if (response.status === 200) {
-      const data = response.data;
-      const { payload, expiresIn } = data; // Assuming the response contains token and expiration
-      localStorage.setItem('user', JSON.stringify(payload));
-      localStorage.setItem('expiresIn', Date.now() + expiresIn);
-      dispatch(login());
-      toast.success('Login successful', {
-        position: "top-left",
-        autoClose: 2000,
-        hideProgressBar: true,
+    try {
+      const response = await axios.post('/admin/login', {
+        email,
+        password
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
       });
-      setEmail('');
-      setPassword('');
-      setTimeout(() => {
-        Navigate('/');
-      }, 1000);
-    } 
-    else {
-      toast.error('Login failed', {
+  
+      const { data, status } = response;
+  
+      if (status === 200) {
+        const { payload, expiresIn } = data;
+        localStorage.setItem('user', JSON.stringify(payload));
+        localStorage.setItem('expiresIn', Date.now() + expiresIn);
+        dispatch(login());
+        toast.success('Login successful', {
+          position: "top-left",
+          autoClose: 2000,
+          hideProgressBar: true,
+        });
+        setEmail('');
+        setPassword('');
+        setTimeout(() => {
+          Navigate('/');
+        }, 1000);
+      } else {
+        throw new Error('Login failed');
+      }
+    } catch (error) {
+      toast.error(`${error.response.data}`, {
         position: "top-left",
         autoClose: 2000,
         hideProgressBar: true,
       });
     }
   };
+  
 
   return (
     <div className="login-container">
