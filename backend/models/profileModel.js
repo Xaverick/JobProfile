@@ -21,17 +21,22 @@ const profileSchema = new Schema({
         type: String,
         required: true
     },
-
+    
     dateOfBirth: {
         type: Date,
         required: true
     },
-
+    
     address: {
         type: String,
         required: true
     },
 
+    // userId: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "User"
+    // },
+    
     categories: [
         {
             type: Schema.Types.ObjectId,
