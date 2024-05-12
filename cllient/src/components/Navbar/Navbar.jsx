@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './Navbar.scss';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -9,6 +9,16 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);
 
+  
+  
+  
+  useEffect(() => {
+    if(!isLoggedIn) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('expiresIn');
+      dispatch(logout());
+    }
+  }, [isLoggedIn]);
 
   const handleLogout = async () => {
       const response = await fetch('http://localhost:4000/user/logout', {

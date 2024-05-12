@@ -3,8 +3,20 @@ import './Signup.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import {  toast } from 'react-toastify';
 import axios from 'axios';
+import { FcGoogle } from "react-icons/fc";
 
 const Signup = () => {
+
+  const googleAuth = () => {
+    
+    const link = import.meta.env.DEV ? import.meta.env.VITE_LOCALHOST : import.meta.env.VITE_PRODUCTION
+    window.open(
+			`${link}/auth/google/callback`,
+			"_self"
+		);
+  };
+
+
   const Navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -108,11 +120,17 @@ const Signup = () => {
         </div>
         
         <button type="submit">Signup</button>
+        <div className='flex justify-center m-2 text-lg'> Or</div>
+        <a className="googleButton" onClick={googleAuth}>
+						<span className="icon"><FcGoogle /></span> &nbsp; Sign in with Google
+        </a>   
         <div className='auth-link'>
-          <Link to="/login" className="login">
+        <Link to="/login" className="login">
             Already have an account? Login
           </Link>
+
         </div>
+
       </form>
 
     </div>

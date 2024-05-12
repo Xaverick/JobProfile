@@ -8,6 +8,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require('cookie-parser');
 const expressError = require("./utils/ExpressError");
+const passport = require('passport');
 
 
 
@@ -27,9 +28,10 @@ app.use(cors({
     origin: ["http://localhost:5173", "http://localhost:5174"],
     credentials: true
 }));
- 
+app.use(passport.initialize()); 
 
-
+const authRoutes = require("./routes/authRoutes");
+app.use('/auth', authRoutes);
 const userRoute = require("./routes/userRoute");
 app.use("/user", userRoute);
 const adminRoute = require("./routes/adminRoute");

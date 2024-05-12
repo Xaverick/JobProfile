@@ -32,11 +32,6 @@ const profileSchema = new Schema({
         required: true
     },
 
-    // userId: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: "User"
-    // },
-    
     categories: [
         {
             type: Schema.Types.ObjectId,

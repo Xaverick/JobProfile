@@ -7,6 +7,7 @@ import {Provider} from 'react-redux'
 import {store} from './store/store.jsx'
 import axios from 'axios'
 
+
 if (import.meta.env.DEV) {
   //for vite application
   console.log("Running in development mode");

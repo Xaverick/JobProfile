@@ -37,9 +37,9 @@ module.exports.login = async (req, res) => {
         throw new ExpressError("Invalid credentials", 400);
     }
     const token = jwt.sign({ id: user._id }, process.env.USER_SECRET, { expiresIn: '3h'});
-    res.cookie('userjwt', token, { signed: true, httpOnly: true, sameSite: 'none', maxAge: 1000 * 60 * 60 * 3, secure: true })
+    res.cookie('userjwt', {token : token, expiresIn: new Date(Date.now() + 3 * 60 * 60 * 1000)}, { signed: true, httpOnly: true, sameSite: 'none', maxAge: 1000 * 60 * 60 * 3, secure: true })
     const payload = { userId: user._id, email: user.email, username: user.username };
-    res.status(200).json({ payload, expiresIn: 1000 * 60 * 60 *3});
+    res.status(200).json({ payload, expiresIn: new Date(Date.now() + 3 * 60 * 60 * 1000)});
     
 }
 

@@ -5,8 +5,6 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
-
-
 const isAdmin = async (req, res, next) => {
 
     const token = req.signedCookies.adminjwt;
@@ -28,17 +26,22 @@ const isAdmin = async (req, res, next) => {
 
 
 const isUser = async (req, res, next) => {
-    const token = req.signedCookies.userjwt;
-    if (!token) {
-        return res.status(401).json("Unauthorized");
+    const cookie = req.signedCookies.userjwt;
+
+    if (!cookie) {
+        return res.status(401).json("Not Logged In");
     }
     try {
+        const token = cookie.token;
+        const expiresIn = cookie.expiresIn;
+        // console.log(token, expiresIn);
         const decoded = jwt.verify(token, process.env.USER_SECRET);
         const user = await User.findById(decoded.id);
         if (!user) {
             throw new Error("Unauthorized");
         }
         req.userId = user.id;
+        req.expIn = expiresIn;
         next();
     }
     catch (e) {

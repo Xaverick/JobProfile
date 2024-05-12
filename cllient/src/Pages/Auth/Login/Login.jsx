@@ -1,16 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './Login.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { login } from '../../../store/slices/authSlice';
 import axios from 'axios';
+import { FcGoogle } from "react-icons/fc";
 
 const Login = () => {
+
+  const Navigate = useNavigate();
+  const googleAuth = () => {
+    
+    const link = import.meta.env.DEV ? import.meta.env.VITE_LOCALHOST : import.meta.env.VITE_PRODUCTION
+    
+    window.open(
+			`${link}/auth/google/callback`,
+			"_self"
+		);
+  };
+
   const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const Navigate = useNavigate();
+
+
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -20,6 +35,51 @@ const Login = () => {
       setPassword(value);
     }
   };
+
+
+  useEffect(() => {
+
+    const getDetails = async () => {
+      try {
+        const response = await axios.get('/auth/getDetails', 
+          {
+            withCredentials: true
+          }
+        );
+    
+        const { data, status } = response;
+    
+        if (status === 200) {
+          const { payload, expiresIn } = data;
+          localStorage.setItem('user', JSON.stringify(payload));
+          localStorage.setItem('expiresIn', expiresIn);
+          dispatch(login());
+          toast.success('Login successful', {
+            position: "top-left",
+            autoClose: 2000,
+            hideProgressBar: true,
+          });
+          setEmail('');
+          setPassword('');
+          setTimeout(() => {
+            Navigate('/');
+          }, 1000);
+        } else {
+          throw new Error('Login failed');
+        }
+      } catch (error) {
+        console.log('Error during login:', error);
+      }
+    }
+    if(localStorage.getItem('isLoggedIn') === 'true') {
+      Navigate('/');
+    }
+    else{
+      getDetails();
+    }
+
+    
+  })
 
   const handleSubmit = async (event) => {
     event.preventDefault();  
@@ -38,7 +98,7 @@ const Login = () => {
       if (status === 200) {
         const { payload, expiresIn } = data;
         localStorage.setItem('user', JSON.stringify(payload));
-        localStorage.setItem('expiresIn', Date.now() + expiresIn);
+        localStorage.setItem('expiresIn', expiresIn);
         dispatch(login());
         toast.success('Login successful', {
           position: "top-left",
@@ -92,6 +152,10 @@ const Login = () => {
           />
         </div>
         <button type="submit">Login</button>
+        <div className='flex justify-center m-2 text-lg'> Or</div>
+        <a className="googleButton" onClick={googleAuth}>
+						<span className="icon"><FcGoogle /></span> &nbsp; Sign in with Google
+        </a>   
         <div className='auth-link'>
           <Link to="/signup" className="signup">
             Already have an account? Signup
