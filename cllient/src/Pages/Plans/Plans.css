@@ -1,0 +1,25 @@
+/* PlansPage.css */
+
+.plan-card {
+    transition: all 0.3s ease;
+  }
+  
+  .plan-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .btn-buy-now {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-buy-now:hover {
+    background-color: #45a049;
+  }
+  

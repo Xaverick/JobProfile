@@ -12,7 +12,8 @@ import SearchJob from './Pages/SearchJob/SearchJob'
 import MakeProfile from './Pages/MakeProfile/MakeProfile'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import DashBoard from './Pages/DashBoard/DashBoard'
+import Plans from './Pages/Plans/Plans'
 
 function App() {
 
@@ -23,12 +24,10 @@ function App() {
     <Navbar />
     <Routes>
       <Route path="/" element={<Home />} />
-      
+      <Route path="/plans" element={<Plans />} />
       <Route element={<PrivateRoutes />} >
-        <Route path="/searchJob" element={<SearchJob />} />
-        <Route path="/yourProfile" element={<Profile />} />
-        <Route path="/job/:id" element={<Job />} />
-        <Route path="/makeProfile" element={<MakeProfile />} />
+        <Route path="/Dashboard" element={<DashBoard />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
       
       <Route path="/login" element={<Login />} />

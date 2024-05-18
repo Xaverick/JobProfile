@@ -68,7 +68,7 @@ const Signup = () => {
       }
     } catch (error) {
       console.error('Error during signup:', error);
-      toast.error('Signup failed', {
+      toast.error(`${error.response.data}`, {
         position: "top-left",
         autoClose: 2000,
         hideProgressBar: true,

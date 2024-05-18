@@ -28,8 +28,7 @@ passport.deserializeUser(function(id, callback) {
 module.exports.googleCallback = async (req, res) => {
     console.log("\n******** Inside handleGoogleLoginCallback function ********");
     // console.log("User Google Info", req.user);
-
-    const existingUser = await User.findOne({ email: req.user._json.email });
+    let existingUser = await User.findOne({ email: req.user._json.email });
 
     if (existingUser) {
       if(!existingUser.googleId) {
@@ -44,7 +43,7 @@ module.exports.googleCallback = async (req, res) => {
     else{  
 
       console.log("Creating new Unregistered User");
-      const unregisteredUser = await User.create({
+      existingUser = await User.create({
         name: req.user._json.name,
         email: req.user._json.email,
         picture: req.user._json.picture,
@@ -59,13 +58,9 @@ module.exports.googleCallback = async (req, res) => {
 };
 
 exports.getUserDetails = async (req, res) => {
-  try {
     const user = await User.findById(req.userId);
     res.status(200).json({payload: user, expiresIn: req.expIn});
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
+  
 };
 
 module.exports.logout = (req, res) => {

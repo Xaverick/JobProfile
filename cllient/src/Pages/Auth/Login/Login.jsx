@@ -62,7 +62,7 @@ const Login = () => {
           setEmail('');
           setPassword('');
           setTimeout(() => {
-            Navigate('/');
+            Navigate('/dashboard');
           }, 1000);
         } else {
           throw new Error('Login failed');
@@ -72,7 +72,7 @@ const Login = () => {
       }
     }
     if(localStorage.getItem('isLoggedIn') === 'true') {
-      Navigate('/');
+      Navigate('/dashboard');
     }
     else{
       getDetails();
@@ -108,7 +108,7 @@ const Login = () => {
         setEmail('');
         setPassword('');
         setTimeout(() => {
-          Navigate('/');
+          Navigate('/dashboard');
         }, 1000);
       } else {
         throw new Error('Login failed');

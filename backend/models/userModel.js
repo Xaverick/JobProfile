@@ -12,7 +12,9 @@ const userSchema = new Schema({
         type: String
     },
 
-    photo: String, 
+    picture: {
+        type: String
+    }, 
 
     email: {
         type: String,
@@ -28,16 +30,18 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Profile'
     },
+    plan: {
+        type: String,
 
-    likededIn: {
+    },
+    amount: {
+        type: Number,
+    },
+
+    paymentId: {
         type: String
     },
-    
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    
+
 });
 
 

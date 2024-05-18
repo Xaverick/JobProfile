@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
-import './Navbar.scss';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
+import axios from 'axios';
 
 const Navbar = () => {
   const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
   const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);
 
-  
-  
-  
   useEffect(() => {
-    if(!isLoggedIn) {
+    if (!isLoggedIn) {
       localStorage.removeItem('user');
       localStorage.removeItem('expiresIn');
       dispatch(logout());
@@ -21,23 +18,25 @@ const Navbar = () => {
   }, [isLoggedIn]);
 
   const handleLogout = async () => {
-      const response = await fetch('http://localhost:4000/user/logout', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        
-      });
 
+    try{
+      const response = await axios.get('/user/logout')
+  
+  
       if (!response.ok) {
         localStorage.removeItem('user');
         localStorage.removeItem('expiresIn');
+        dispatch(logout());
+        window.location.reload();
       }
 
+    } catch(error){
       localStorage.removeItem('user');
       localStorage.removeItem('expiresIn');
       dispatch(logout());
+      
+    }
+
   };
 
   const toggleMenu = () => {
@@ -45,28 +44,62 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`navbar ${showMenu ? 'show-menu' : ''}`}>
-      <div className="navbar-left">
-        <Link to="/" ><h1 className="navbar-logo">PINNACLE</h1></Link>
-        <Link to="/searchJob" className="navbar-link">Search Job</Link>
-        {isLoggedIn && <Link to="/yourProfile" className="navbar-link">Your Profile</Link>}
-         {isLoggedIn && <Link to="/makeProfile" className="navbar-link">Make Your Profile</Link>}
-
+    <nav className="flex items-center justify-between flex-wrap bg-gray-800 p-6">
+      <div className="flex items-center flex-shrink-0 text-white mr-6">
+        <Link to="/">
+          <h1 className="font-semibold text-xl tracking-tight">Pinnacle.biz</h1>
+        </Link>
+        {isLoggedIn && (
+          <Link
+            to="/dashboard"
+            className="ml-8 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4 text-lg"
+          >
+            Dashboard
+          </Link>
+        )}
       </div>
-      <div className="navbar-right">
-        <div className="menu-icon" onClick={toggleMenu}>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <div className={`menu-items ${showMenu ? 'show' : ''}`}>
+      <div className="block lg:hidden">
+        <button
+          className="flex items-center px-3 py-2 border rounded text-gray-200 border-gray-400 hover:text-white hover:border-white"
+          onClick={toggleMenu}
+        >
+          <svg
+            className="fill-current h-3 w-3"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>Menu</title>
+            <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+          </svg>
+        </button>
+      </div>
+      <div className={`w-full block lg:flex lg:items-center lg:w-auto ${showMenu ? 'block' : 'hidden'}`}>
+        <div className="text-sm lg:flex-grow lg:text-right">
           {!isLoggedIn ? (
             <>
-              <Link to="login" className="navbar-link">Login</Link>
-              <Link to="signup" className="navbar-link">Signup</Link>
+              <Link
+                to="login"
+                className="block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4 text-lg"
+              >
+                Login
+              </Link>
+              <Link
+                to="signup"
+                className="block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white text-lg"
+              >
+                Signup
+              </Link>
             </>
           ) : (
-            <a href="#" className="navbar-link" onClick={handleLogout}>Logout</a>
+            <>
+            <a
+              href="#"
+              className="block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white text-lg"
+              onClick={handleLogout}
+            >
+              Logout
+            </a>
+            </>
           )}
         </div>
       </div>
@@ -75,95 +108,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
-
-
-// import { useState } from 'react';
-// import './Navbar.scss';
-// import { Link } from 'react-router-dom';
-// import { useSelector, useDispatch } from 'react-redux';
-// import { logout } from '../../store/slices/authSlice';
-
-// const Navbar = () => {
-//   const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
-//   const dispatch = useDispatch();
-//   const [showMenu, setShowMenu] = useState(false);
-//   const [showProfileMenu, setShowProfileMenu] = useState(true); // State to control profile menu visibility
-
-//   const handleLogout = async () => {
-//     const response = await fetch('http://localhost:4000/user/logout', {
-//       method: 'GET',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       credentials: 'include',
-      
-//     });
-
-//     if (!response.ok) {
-//       localStorage.removeItem('user');
-//       localStorage.removeItem('expiresIn');
-//     }
-
-//     localStorage.removeItem('user');
-//     localStorage.removeItem('expiresIn');
-//     dispatch(logout());
-
-
-// };
-
-//   const toggleMenu = () => {
-//     setShowMenu(!showMenu);
-//   };
-
-//   const toggleProfileMenu = () => {
-//     setShowProfileMenu(!showProfileMenu);
-//   };
-
-//   return (
-//     <nav className={`navbar ${showMenu ? 'show-menu' : ''}`}>
-//       <div className="navbar-left">
-//         <Link to="/"><h1 className="navbar-logo">PINNACLE</h1></Link>
-//         <Link to="/searchJob" className="navbar-link">Search Job</Link>
-//         {/* Conditionally render profile link if user is logged in */}
-//         {isLoggedIn && <Link to="/yourProfile" className="navbar-link">Your Profile</Link>}
-//         {/* Conditionally render make profile link if user is logged in */}
-//         {isLoggedIn && <Link to="/makeProfile" className="navbar-link">Make Your Profile</Link>}
-//       </div>
-//       <div className="navbar-right">
-//         <div className="profile-circle" onMouseEnter={toggleProfileMenu} onMouseLeave={toggleProfileMenu}>
-//           {/* Profile circle icon */}
-//           <div className="profile-icon"></div>
-//           {/* Dropdown menu for profile actions */}
-//           {showProfileMenu && (
-//             <div className="profile-menu">
-//               {/* Option to see user's profile */}
-//               <Link to="/profile" className="menu-item">View Profile</Link>
-//               {/* Option to delete user's profile */}
-//               <Link to="/deleteProfile" className="menu-item">Delete Profile</Link>
-//               {/* Option to edit user's profile */}
-//               <Link to="/editProfile" className="menu-item">Edit Profile</Link>
-//             </div>
-//           )}
-//         </div>
-//         <div className="menu-icon" onClick={toggleMenu}>
-//           <span></span>
-//           <span></span>
-//           <span></span>
-//         </div>
-//         <div className={`menu-items ${showMenu ? 'show' : ''}`}>
-//           {!isLoggedIn ? (
-//             <>
-//               <Link to="login" className="navbar-link">Login</Link>
-//               <Link to="signup" className="navbar-link">Signup</Link>
-//             </>
-//           ) : (
-//             <a href="#" className="navbar-link" onClick={handleLogout}>Logout</a>
-//           )}
-//         </div>
-//       </div>
-//     </nav>
-//   );
-// };
-
-// export default Navbar;

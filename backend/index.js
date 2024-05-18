@@ -36,7 +36,8 @@ const userRoute = require("./routes/userRoute");
 app.use("/user", userRoute);
 const adminRoute = require("./routes/adminRoute");
 app.use("/admin", adminRoute);
-
+const paymentRoute = require("./routes/paymentRoute");
+app.use("/payment", paymentRoute);
 
 
 app.all("*", (req, res, next) => {
