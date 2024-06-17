@@ -49,7 +49,8 @@ module.exports.login = async (req, res) => {
         throw new ExpressError("Invalid credentials", 400);
     }
     const token = jwt.sign({ id: user._id }, process.env.USER_SECRET, { expiresIn: '3h'});
-    res.cookie('userjwt', {token : token, expiresIn: new Date(Date.now() + 3 * 60 * 60 * 1000)}, { signed: true, httpOnly: true, sameSite: 'none', maxAge: 1000 * 60 * 60 * 3, secure: true })
+    // res.cookie('userjwt', {token : token, expiresIn: new Date(Date.now() + 3 * 60 * 60 * 1000)}, { signed: true, httpOnly: true, sameSite: 'none', maxAge: 1000 * 60 * 60 * 3, secure: true })
+    res.cookie('userjwt', {token : token, expiresIn: new Date(Date.now() + 3 * 60 * 60 * 1000)}, { signed: true, maxAge: 1000 * 60 * 60 * 3 })
     const payload = {
         id: user._id,
         name: user.name,
@@ -70,9 +71,6 @@ module.exports.logout = async (req, res) => {
     console.log("In Logout");
     res.clearCookie('userjwt', {
         signed: true,
-        httpOnly: true,
-        sameSite: 'none',
-        secure: true
     });
     res.status(200).json({ message: "Logged out successfully" });
 }
