@@ -36,9 +36,9 @@ const Navbar = () => {
     <nav className={`navbar ${showMenu ? 'show-menu' : ''}`}>
       <div className="navbar-left">
         <Link to="/" ><h1 className="navbar-logo">PINNACLE</h1></Link>
-        <Link to="/" className="navbar-link">Search Candidates</Link>
-        <Link to="/Categories" className="navbar-link">Categories</Link>
-        <Link to="/upload" className="navbar-link">Upload Resumes</Link>
+        <Link to="/" className="navbar-link">Home</Link>
+        <Link to="/createplan" className="navbar-link">Create Plan</Link>
+        {/* <Link to="/upload" className="navbar-link">Upload Resumes</Link> */}
         {/* {isLoggedIn && <Link to="/yourProfile" className="navbar-link">Your Profile</Link>} */}
          {/* {isLoggedIn && <Link to="/makeProfile" className="navbar-link">Make Your Profile</Link>} */}
 

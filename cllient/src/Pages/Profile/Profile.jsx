@@ -1,222 +1,133 @@
-// import React, { useState, useEffect } from 'react';
-// import { Container, Typography, Button, Grid, Paper } from '@mui/material';
-// import { Link,useNavigate } from 'react-router-dom'; // Assuming you're using React Router for navigation
-
-// const UserProfile = () => {
-//   // Dummy user profile data
-//   const dummyUserProfile = {
-//     fullName: 'John Doe',
-//     email: 'john@example.com',
-//     phone: '123-456-7890',
-//     experience: 'Senior Software Engineer at ABC Inc.',
-//     skills: 'React, Node.js, JavaScript',
-//     education: 'Bachelor of Science in Computer Science',
-//     additionalInfo: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae metus id massa mattis tincidunt.',
-//   };
-
-//   // State for user profile
-//   const [userProfile, setUserProfile] = useState(null);
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-
-//     const fetchedUserProfile = async () => {
-//       const response = await fetch('http://localhost:4000/user/getProfile', {
-//         method: 'GET',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         credentials: 'include',
-//       });
-
-
-//       if(response.ok){
-//         const data = await response.json();
-//         console.log(data);
-//         setUserProfile(data);
-//       }
-
-//       else{
-//         console.log('Failed to fetch user profile');
-//         navigate('/makeProfile');
-//       }
-
-//     };
-
-//     fetchedUserProfile();
-
-//   }, []); // Empty dependency array to run once on component mount
-
-
-
-//   if (!userProfile) {
-//     return (
-//       <Container maxWidth="md" style={{ marginTop: '50px', marginBottom: '50px' }}>
-//         <Typography variant="h4" gutterBottom>
-//           User Profile
-//         </Typography>
-//         <Paper elevation={3} style={{ padding: '20px' }}>
-//           <Typography variant="body1">No profile is made.</Typography>
-//           <Button component={Link} to="/makeProfile" variant="contained" color="primary" style={{ marginTop: '20px' }}>
-//             Create Profile
-//           </Button>
-//         </Paper>
-//       </Container>
-//     );
-//   }
-
-//   return (
-//     <Container maxWidth="md" style={{ marginTop: '50px', marginBottom: '50px' }}>
-//       <Typography variant="h4" gutterBottom>
-//         User Profile
-//       </Typography>
-//       <Paper elevation={3} style={{ padding: '20px' }}>
-//         <Grid container spacing={2}>
-//           <Grid item xs={12} sm={6}>
-//             <Typography variant="h6">Full Name:</Typography>
-//             <Typography>{userProfile.fullName}</Typography>
-//           </Grid>
-//           <Grid item xs={12} sm={6}>
-//             <Typography variant="h6">Email:</Typography>
-//             <Typography>{userProfile.email}</Typography>
-//           </Grid>
-//           <Grid item xs={12} sm={6}>
-//             <Typography variant="h6">Phone:</Typography>
-//             <Typography>{userProfile.phone}</Typography>
-//           </Grid>
-//           <Grid item xs={12}>
-//             <Typography variant="h6">Experience:</Typography>
-//             <Typography>{userProfile.experience}</Typography>
-//           </Grid>
-//           <Grid item xs={12}>
-//             <Typography variant="h6">Skills:</Typography>
-//             <Typography>{userProfile.skills}</Typography>
-//           </Grid>
-//           <Grid item xs={12}>
-//             <Typography variant="h6">Education:</Typography>
-//             <Typography>{userProfile.education}</Typography>
-//           </Grid>
-//           <Grid item xs={12}>
-//             <Typography variant="h6">Additional Information:</Typography>
-//             <Typography>{userProfile.additionalInfo}</Typography>
-//           </Grid>
-//         </Grid>
-//         <Grid item xs={12} style={{ marginTop: '20px' }}>
-//             <Button component={Link} to="/edit-profile" variant="outlined" color="primary">
-//               Edit Profile
-//             </Button>
-//           </Grid>
-//       </Paper>
-//     </Container>
-//   );
-// };
-
-// export default UserProfile;
-
-
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button, Grid, Paper } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom'; // Import Link
+import Loader from '../../components/Loader/Loader';
 
 const UserProfile = () => {
-  const [userProfile, setUserProfile] = useState(null);
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch('http://localhost:4000/user/getProfile', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-        });
-
-        if (response.ok) {
-          let data = await response.json();
-          setUserProfile(data.profile);
-          setUser(data.user);
-        } else {
-          console.log('Failed to fetch user profile');
-          navigate('/makeProfile');
-        }
+        setLoading(true);
+        const response = await axios.get('/user/getProfile');
+        setUserProfile(response.data);
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching user profile:', error);
+        console.log(error);
+        setLoading(false);
       }
     };
 
     fetchUserProfile();
-  }, []); // Empty dependency array to run once on component mount
-
+  }, []);
+  
   if (!userProfile) {
     return (
-      <Container maxWidth="md" style={{ marginTop: '50px', marginBottom: '50px' }}>
-        <Typography variant="h4" gutterBottom>
-          User Profile
-        </Typography>
-        <Paper elevation={3} style={{ padding: '20px' }}>
-          <Typography variant="body1">No profile is made.</Typography>
-          <Button component={Link} to="/makeProfile" variant="contained" color="primary" style={{ marginTop: '20px' }}>
+      <div className="container mx-auto flex flex-col items-center justify-center h-screen p-3">
+        <Loader loading={loading} message={'Loading profile'} />
+        <h1 className="text-3xl font-bold mb-4">User Profile</h1>
+        <div className="p-6 bg-gray-100 rounded-lg text-center">
+          <p className="text-lg">No profile is made.</p>
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+            onClick={() => {
+              navigate('/createProfile');
+            }}
+          >
             Create Profile
-          </Button>
-        </Paper>
-      </Container>
+          </button>
+        </div>
+      </div>
     );
   }
 
+  const {
+    fullName,
+    phoneNumber,
+    experience,
+    specialization,
+    education,
+    resume,
+    linkedIn,
+    organization,
+    contactMethod,
+  } = userProfile;
+
   return (
-    <Container maxWidth="md" style={{ marginTop: '50px', marginBottom: '50px' }}>
-      <Typography variant="h4" gutterBottom>
-        User Profile
-      </Typography>
-      <Paper elevation={3} style={{ padding: '20px' }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">Full Name:</Typography>
-            <Typography>{userProfile.firstName} {userProfile.lastName}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">Email:</Typography>
-            <Typography>{user.email}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">Phone:</Typography>
-            <Typography>{userProfile.phoneNumber}</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6">Address:</Typography>
-            <Typography>{userProfile.address}</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6">Skills:</Typography>
-            <Typography>{userProfile.skills.join(', ')}</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6">Education:</Typography>
-            {userProfile.education.map((edu, index) => (
-              <Typography key={index}>{edu.degree} - {edu.institution}, {edu.fieldOfStudy}</Typography>
-            ))}
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6">Experience:</Typography>
-            {userProfile.experience.map((exp, index) => (
-              <Typography key={index}>{exp.title} at {exp.company}, {new Date(exp.startDate).toLocaleDateString()} to {new Date(exp.endDate).toLocaleDateString()}</Typography>
-            ))}
-          </Grid>
-          <Grid item xs={12}>
-            <Button variant="outlined" color="primary" href={userProfile.resume} target="_blank">
-              View Resume
-            </Button>
-          </Grid>
-        </Grid>
-        <Grid item xs={12} style={{ marginTop: '20px' }}>
-          {/* <Button component={Link} to="/edit-profile" variant="outlined" color="primary">
-            Edit Profile
-          </Button> */}
-        </Grid>
-      </Paper>
-    </Container>
+    <div className="container mx-auto">
+      <Loader loading={loading} message={'Loading profile'} />
+      <h1 className="text-3xl font-bold mb-4">User Profile</h1>
+      <div className="p-6 bg-gray-100 rounded-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <h2 className="text-lg font-semibold">Full Name:</h2>
+            <p>{fullName}</p>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Phone:</h2>
+            <p>{phoneNumber}</p>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Experience:</h2>
+            <p>{experience}</p>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Specialization:</h2>
+            <p>{specialization}</p>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Education:</h2>
+            <p>{education}</p>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Organization:</h2>
+            <p>{organization}</p>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Contact Method:</h2>
+            <p>{contactMethod}</p>
+          </div>
+          {linkedIn && (
+            <div>
+              <h2 className="text-lg font-semibold">LinkedIn:</h2>
+              <a
+                href={linkedIn}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                View LinkedIn
+              </a>
+            </div>
+          )}
+          {resume && (
+            <div className="col-span-2">
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+                <a
+                  href={resume}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white"
+                >
+                  View Resume
+                </a>
+              </button>
+            </div>
+          )}
+          <div className="col-span-2">
+            {/* Add Link component for navigation */}
+            <Link to={`/editProfile/${userProfile.userId}`}>
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+                Edit Profile
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

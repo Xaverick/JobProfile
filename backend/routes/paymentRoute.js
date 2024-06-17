@@ -1,12 +1,12 @@
 const router = require('express').Router();
 const catchAsync = require("../utils/catchAsync");
 const payment = require("../controllers/paymentController");
-const {isUser, upload} = require("../middleware");
+const {isUser} = require("../middleware");
 
 
 
 router.route('/create-order')
-    .post(isUser, upload.single('file'), catchAsync(payment.createOrder));
+    .post(isUser, catchAsync(payment.createOrder));
   
 router.route('/verify')
     .post(isUser, catchAsync(payment.verify));

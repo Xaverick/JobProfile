@@ -1,41 +1,46 @@
-/* eslint-disable react/prop-types */
-import './Plans.css'; // Import your CSS file for styling
-import { useSelector } from 'react-redux';
+import { useState, useEffect } from "react";
+import classNames from "classnames";
+import { useSwipeable } from "react-swipeable";
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+
+const capitalizeTitle = (title) => {
+  return title.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};
+
+const PricingPanel = () => {
+  const navigate = useNavigate();
+  const [plans, setPlans] = useState([]);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await axios.get('/user/getplans');
+        const plans = response.data.sort((a, b) => a.price - b.price);
+        setPlans(plans);
+        console.log(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchPlans();
+
+  }, []);
 
 
-function PlanCard({ plan }) {
-  const profileData =  useSelector((state) => state.formData.formData);
-
-  
   const handlePayment = async (plan) => {
-    console.log('profileData', profileData);
     try {
-      const newForm = new FormData();
 
-      newForm.append('fullName', profileData.fullName);
-      newForm.append('email', profileData.email);
-      newForm.append('phoneNumber', profileData.phoneNumber);
-      newForm.append('file', profileData.file);
-      newForm.append('linkedIn', profileData.linkedIn);
-      newForm.append('experience', profileData.experience);
-      newForm.append('education', profileData.education);
-      newForm.append('organization', profileData.organization);
-      newForm.append('contactMethod', profileData.contactMethod);
-      newForm.append('additionalInfo', profileData.additionalInfo);
-      newForm.append('referralSource', profileData.referralSource);
-      newForm.append('specialization', profileData.specialization); 
-      newForm.append('amount', plan.amount);
+      const userProfile = await axios.get('/user/getProfile');
+      const user = userProfile.data;
 
-      const order = await axios.post('/payment/create-order', newForm, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const order = await axios.post('/payment/create-order', {
+        amount: plan.price,
       });
+
       console.log(order)
       const { amount, id: order_id, currency } = order.data.order;
-      const file = order.data.file
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY, // Enter the Key ID generated from the Dashboard
         amount: amount.toString(),
@@ -45,14 +50,10 @@ function PlanCard({ plan }) {
         order_id: order_id,
         handler: async (response) => {
           try {
-            // newForm.append('response', JSON.stringify(response));
-            // newForm.append('plan', JSON.stringify(plan));
-            // console.log('newForm', newForm);
+
             const paymentResult = await axios.post('/payment/verify', {
               response,
-              plan,
-              profileData,
-              file
+              plan
             }
             );
 
@@ -61,7 +62,16 @@ function PlanCard({ plan }) {
               autoClose: 2000,
               hideProgressBar: true,
             });
-            // You can redirect to the success page or update the UI accordingly
+
+            const userResponse = await axios.get('/user/userDetails');
+            const user = userResponse.data;
+
+            if (user) {
+              localStorage.setItem('user', JSON.stringify(user));
+            }
+
+            navigate('/dashboard')
+
           } catch (error) {
             console.error(error);
             toast.error('Payment Verification Failed Pls contact admin', {
@@ -71,11 +81,11 @@ function PlanCard({ plan }) {
             });
           }
         },
-        
+
         prefill: {
-          name: newForm.fullName,
-          email: newForm.email,
-          contact: newForm.phoneNumber,
+          name: user.name,
+          email: user.email,
+          contact: user.phoneNumber,
         },
         notes: {
           address: 'Razorpay Corporate Office',
@@ -90,7 +100,7 @@ function PlanCard({ plan }) {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (error) {
-      toast.error("Fill the form and try again.", {
+      toast.error(`${error.response.data}`, {
         position: "top-left",
         autoClose: 2000,
         hideProgressBar: true,
@@ -98,67 +108,69 @@ function PlanCard({ plan }) {
     }
   };
 
-  return (
-    <div className="plan-card bg-white shadow-lg rounded-lg overflow-hidden mx-4 my-8 md:my-0 md:w-96">
-      <div className="plan-content flex flex-col justify-between h-full px-6 py-8">
-        <div>
-          <h2 className="text-2xl font-bold text-center mb-4">{plan.title}</h2>
-          <p className="text-gray-600 text-lg mb-6">{plan.price}</p>
-          <ul className="list-disc pl-6">
-            {plan.benefits.map((benefit, index) => (
-              <li key={index} className="text-lg mb-2">{benefit}</li>
-            ))}
-          </ul>
-        </div>
-        <button className="btn-buy-now block mx-auto mt-8" onClick={() => handlePayment(plan)}>Buy Now</button>
-      </div>
-    </div>
-  );
-}
+  const [selectedPlan, setSelectedPlan] = useState(1);
 
-function Plans() {
-  const plans = [
-    {
-      title: "Silver",
-      price: "Rs. 7999",
-      amount : 7999,
-      benefits: [
-        "CV writing services",
-        "Career counselling on up to 2 calls"      
-      ]
-    },
-    {
-      title: "Gold",
-      price: "Rs. 9999",
-      amount : 9999,
-      benefits: [
-        "CV writing services",
-        "ATS Tricks & Tips",
-        "Career counselling on up to 4 calls"
-      ]
-    },
-    {
-      title: "Diamond",
-      price: "Rs. 10999",
-      amount : 10999,
-      benefits: [
-        "CV writing services",
-        "Linkedin Profile Building",
-        "ATS Tricks & Tips",
-        "Career counselling on up to 4 calls"
-      ]
-    }
-  ];
+  const handleSelectPlan = (index) => {
+    setSelectedPlan(index);
+  };
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => handleSelectPlan(selectedPlan === plans.length - 1 ? 0 : selectedPlan + 1),
+    onSwipedRight: () => handleSelectPlan(selectedPlan === 0 ? plans.length - 1 : selectedPlan - 1),
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+  });
+
 
   return (
-    <div className="bg-gray-100 min-h-screen flex justify-center items-center">
-      <div className="flex flex-wrap justify-center">
+    <div {...swipeHandlers} className="flex flex-col justify-center items-center min-h-screen lg:mt-[20px]">
+      <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-8 max-w-6xl w-full px-4 sm:px-6 lg:px-8">
         {plans.map((plan, index) => (
-          <PlanCard key={index} plan={plan} />
+          <div
+            key={plan.title}
+            className={classNames(
+              "flex flex-col justify-between bg-white rounded-lg shadow-lg p-6 transition-transform duration-300",
+              {
+                "scale-110 translate-y-[10px] shadow-xxl sm:ml-5 sm:mr-5":
+                  selectedPlan === index,
+                "hover:scale-105": selectedPlan !== index,
+              }
+            )}
+            onClick={() => handleSelectPlan(index)}
+          >
+            <div>
+              <h2 className="text-xl font-bold mb-4">{capitalizeTitle(plan.title)}</h2>
+              <div className="text-3xl font-bold mb-4">Rs. {plan.price}</div>
+              <ul className="text-left mb-6">
+                {plan.services.map((item) => (
+                  <li key={item._id} className="mb-2">
+                    <svg
+                      className="h-6 w-6 inline-block mr-2 fill-current text-green-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M2 10l4 4 10-10"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    {item.service.title} - {item.maxCalls} calls
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={() => handlePayment(plan)}>
+              Choose Plan
+            </button>
+          </div>
         ))}
       </div>
     </div>
   );
-}
+  
+};
 
-export default Plans;
+
+export default PricingPanel;

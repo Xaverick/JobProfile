@@ -29,15 +29,16 @@ module.exports.googleCallback = async (req, res) => {
     console.log("\n******** Inside handleGoogleLoginCallback function ********");
     // console.log("User Google Info", req.user);
     let existingUser = await User.findOne({ email: req.user._json.email });
-
+    const redirectUrl = process.env.NODE_ENV === 'production' ? `${process.env.SITE_URL}/login` : 'http://localhost:5173/login';
     if (existingUser) {
       if(!existingUser.googleId) {
         existingUser.googleId = req.user._json.sub;
+        existingUser.picture = req.user._json.picture;
         await existingUser.save();
       }
       const token = jwt.sign({ id: existingUser._id }, process.env.USER_SECRET, { expiresIn: '3h' });  
-      res.cookie("userjwt", {token: token , expiresIn: new Date(Date.now() + 3 * 60 * 60 * 1000)}, { httpOnly: true, maxAge:3* 60 * 60 * 1000, secure: false, signed: true });
-      return res.redirect(`http://localhost:5173/login`);
+      res.cookie("userjwt", {token: token , expiresIn: new Date(Date.now() + 3 * 60 * 60 * 1000)}, { httpOnly: true, maxAge:3* 60 * 60 * 1000, secure: true, signed: true, sameSite: 'none' });
+      return res.redirect(redirectUrl);
     }
 
     else{  
@@ -52,18 +53,35 @@ module.exports.googleCallback = async (req, res) => {
     }
 
     const token = jwt.sign({ id: existingUser._id }, process.env.USER_SECRET, { expiresIn: '3h' });
-    res.cookie("userjwt", {token : token, expiresIn: new Date(Date.now() + 3 * 60 * 60 * 1000)}, { httpOnly: true, maxAge: 3* 60 * 60 * 1000, secure: false,  signed: true });
-    return res.redirect("http://localhost:5173/login");
+    res.cookie("userjwt", {token : token, expiresIn: new Date(Date.now() + 3 * 60 * 60 * 1000)}, { httpOnly: true, maxAge: 3* 60 * 60 * 1000, secure: true,  signed: true, sameSite: 'none' });
+    return res.redirect(redirectUrl);
 
 };
 
 exports.getUserDetails = async (req, res) => {
     const user = await User.findById(req.userId);
-    res.status(200).json({payload: user, expiresIn: req.expIn});
+    const payload = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        picture: user.picture,
+        googleId: user.googleId,
+        profile: user.profile,
+        currentPlan: user.currentPlan,
+        planNameL: user.planName
+        
+    }
+    res.status(200).json({payload: payload, expiresIn: req.expIn});
   
 };
 
 module.exports.logout = (req, res) => {
-  res.clearCookie('userjwt');
-  res.redirect('http://localhost:5173');
+  res.clearCookie('userjwt', {
+    signed: true,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true
+  });
+  const redirectUrl = process.env.NODE_ENV === 'production' ? `${process.env.SITE_URL}/login` : 'http://localhost:5173/login';
+  res.redirect(redirectUrl);
 }

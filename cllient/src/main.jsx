@@ -6,6 +6,15 @@ import {BrowserRouter} from 'react-router-dom'
 import {Provider} from 'react-redux'
 import {store} from './store/store.jsx'
 import axios from 'axios'
+import ReactGA from 'react-ga4';
+
+
+ReactGA.initialize('G-5V1BM1T4EK');
+// Optional: To track page views, use the following line
+ReactGA.send({
+  hitType: 'pageview',
+  page: window.location.pathname
+});
 
 
 if (import.meta.env.DEV) {

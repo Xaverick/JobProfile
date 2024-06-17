@@ -1,299 +1,318 @@
-import { useState, useEffect } from 'react';
-// import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input';
-import 'react-phone-number-input/style.css';
-import { Link } from 'react-router-dom';
-import { updateFormData } from "../../store/slices/formDataSlice";
-import { useDispatch } from 'react-redux';
+// import { useState, useEffect } from "react";
+// import Sidebar from "./Sidebar";
+// import Profile from "../Profile/Profile";
+// import axios from "axios";
+// import Plans from "../Plans/Plans";
+// import OrderHistory from "./OrderHistory";
 
-const FormPage = () => {
-  const [formData, setFormData] = useState({
-    phoneNumber: '',
-    specialization: '',
-    file: '',
-    experience: '',
-    education: '',
-    organization: '',
-    contactMethod: '',
-    additionalInfo: '',
-    referralSource: '',
-    email: '',
-    fullName: '',
-    linkedIn: '' // Add LinkedIn field
-  });
+// const Dashboard = () => {
+//   const [user, setUser] = useState(null);
+//   const [userPlan, setUserPlan] = useState([]);
+//   const [services, setServices] = useState([]);
+//   const [currentView, setCurrentView] = useState("Plan Status");
+//   const [redeemHistory, setRedeemHistory] = useState([]);
+//   const [selectedPlanIndex, setSelectedPlanIndex] = useState(0);
 
-  const dispatch = useDispatch();
+//   useEffect(() => {
+//     const fetchUserProfile = async () => {
+//       try {
+//         const response = await axios.get("/user/userDetails");
+//         setUser(response.data);
+//       } catch (error) {
+//         console.log(error);
+//       }
+//     };
+
+//     const fetchUserPlan = async () => {
+//       try {
+//         const response = await axios.get("/user/currentplan");
+//         setUserPlan(response.data);
+//         setSelectedPlanIndex(0); // Default to the first plan
+//       } catch (error) {
+//         console.log(error);
+//       }
+//     };
+
+//     fetchUserProfile();
+//     fetchUserPlan();
+//   }, []);
+
+//   useEffect(() => {
+//     if (userPlan.length > 0) {
+//       setServices(userPlan[selectedPlanIndex]?.plan.services);
+//       setRedeemHistory(userPlan[selectedPlanIndex]?.plan.redeemHistory);
+//     }
+//   }, [selectedPlanIndex, userPlan]);
+
+//   const handlePlanChange = (event) => {
+//     setSelectedPlanIndex(event.target.value);
+//   };
+
+//   const renderContent = () => {
+//     switch (currentView) {
+//       case "Plan Status":
+//         return (
+//           <>
+//             <div className="flex items-center mb-6">
+//               <img
+//                 src={user?.picture}
+//                 alt="User Avatar"
+//                 className="w-16 h-16 rounded-full mr-4"
+//               />
+//               <div>
+//                 <h2 className="text-xl font-semibold">{user?.name}</h2>
+//                 <p className="text-gray-600">{user?.email}</p>
+//               </div>
+//             </div>
+
+//             {userPlan.length > 0 ? (
+//               <>
+//                 <div className="mb-6 flex items-center">
+//                   <h2 className="text-xl font-semibold mr-4">Your Plan:</h2>
+//                   <select
+//                     value={selectedPlanIndex}
+//                     onChange={handlePlanChange}
+//                     className="p-2 border rounded"
+//                   > 
+//                     {userPlan.map((plan, index) => (
+//                       <option key={index} value={index}>
+//                         {plan.plan.title}
+//                       </option>
+//                     ))}
+//                   </select>
+//                 </div>
+
+//                 <div className="mb-6">
+//                   <h2 className="text-xl font-semibold mb-4">Your Services</h2>
+//                   <div className="space-y-4">
+//                     {services?.map((item, index) => (
+//                       <div key={index} className="p-4 border rounded-lg bg-gray-50">
+//                         <h3 className="text-lg font-medium">{item.service.title}</h3>
+//                         <p>
+//                           Usage: {item.service?.calls} / {item.maxCalls}
+//                         </p>
+//                         <div className="w-full bg-gray-200 rounded-full h-2.5">
+//                           <div
+//                             className="bg-blue-600 h-2.5 rounded-full"
+//                             style={{
+//                               width: `${(item.service.calls / item.maxCalls) * 100}%`,
+//                             }}
+//                           ></div>
+//                         </div>
+//                       </div>
+//                     ))}
+//                   </div>
+//                 </div>
+
+//                 <div className="bg-white p-6 rounded-lg shadow-lg">
+//                   <h2 className="text-xl font-semibold mb-4">Redeem History</h2>
+//                   <div className="space-y-4">
+//                     {redeemHistory?.map((item) => (
+//                       <div key={item._id} className="p-4 border rounded-lg bg-gray-50">
+//                         <h3 className="text-lg font-medium">{item.title}</h3>
+//                         <p>Calls: {item.calls}</p>
+//                         <p>Date: {new Date(item.date).toLocaleString()}</p>
+//                       </div>
+//                     ))}
+//                   </div>
+//                 </div>
+//               </>
+//             ) : (
+//               <Plans />
+//             )}
+//           </>
+//         );
+
+//       case "orderHistory":
+//         return <OrderHistory />;
+//       case "profile":
+//         return <Profile />;
+//       case "services":
+//         return <Plans />;
+//       default:
+//         return null;
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen bg-gray-100 flex margins">
+//       <div className="fixed left-0">
+//         <Sidebar setCurrentView={setCurrentView} />
+//       </div>
+//       <div className="w-full p-6 lg:ml-64">{renderContent()}</div>
+//     </div>
+//   );
+// };
+
+// export default Dashboard;
+
+
+import { useState, useEffect } from "react";
+import Sidebar from "./Sidebar";
+import Profile from "../Profile/Profile";
+import axios from "axios";
+import Plans from "../Plans/Plans";
+import OrderHistory from "./OrderHistory";
+
+const Dashboard = () => {
+  const [user, setUser] = useState(null);
+  const [userPlan, setUserPlan] = useState([]);
+  const [services, setServices] = useState([]);
+  const [currentView, setCurrentView] = useState("Plan Status");
+  const [redeemHistory, setRedeemHistory] = useState([]);
+  const [selectedPlanIndex, setSelectedPlanIndex] = useState(0);
 
   useEffect(() => {
-    // Fetching email and full name from local storage
-    const user = JSON.parse(localStorage.getItem('user')) || {};
-    setFormData({
-      ...formData,
-      email: user.email || '',
-      fullName: user.name || ''
-    });
-  }, []); // Empty dependency array ensures this effect runs only once on component mount
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axios.get("/user/userDetails");
+        setUser(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  const handleCountryCodeChange = (e) => {
-    const { value } = e.target;
-    setFormData({ ...formData, countryCode: value });
+    const fetchUserPlan = async () => {
+      try {
+        const response = await axios.get("/user/currentplan");
+        setUserPlan(response.data);
+        setSelectedPlanIndex(0); // Default to the first plan
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchUserProfile();
+    fetchUserPlan();
+  }, []);
+
+  useEffect(() => {
+    if (userPlan.length > 0) {
+      setServices(userPlan[selectedPlanIndex]?.plan.services);
+      setRedeemHistory(userPlan[selectedPlanIndex]?.plan.redeemHistory);
+    }
+  }, [selectedPlanIndex, userPlan]);
+
+  const handlePlanChange = (event) => {
+    setSelectedPlanIndex(event.target.value);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const groupRedeemHistoryByService = (history) => {
+    return history.reduce((acc, item) => {
+      const serviceTitle = item.title;
+      if (!acc[serviceTitle]) {
+        acc[serviceTitle] = [];
+      }
+      acc[serviceTitle].push(item);
+      return acc;
+    }, {});
   };
 
-  const handleResumeChange = (e) => {
-    setFormData({
-      ...formData,
-      file: e.target.files[0],
-    });
-  }
+  const renderContent = () => {
+    switch (currentView) {
+      case "Plan Status":
+        return (
+          <>
+            <div className="flex items-center mb-6">
+              <img
+                src={user?.picture}
+                alt="User Avatar"
+                className="w-16 h-16 rounded-full mr-4"
+              />
+              <div>
+                <h2 className="text-xl font-semibold">{user?.name}</h2>
+                <p className="text-gray-600">{user?.email}</p>
+              </div>
+            </div>
 
-  const handleNext = () => {
-    dispatch(updateFormData(formData));
-    // console.log(formData);
-  }
+            {userPlan.length > 0 ? (
+              <>
+                <div className="mb-6 flex items-center">
+                  <h2 className="text-xl font-semibold mr-4">Your Plan:</h2>
+                  <select
+                    value={selectedPlanIndex}
+                    onChange={handlePlanChange}
+                    className="p-2 border rounded"
+                  >
+                    {userPlan.map((plan, index) => (
+                      <option key={index} value={index}>
+                        {plan.plan.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold mb-4">Your Services</h2>
+                  <div className="space-y-4">
+                    {services?.map((item, index) => (
+                      <div key={index} className="p-4 border rounded-lg bg-gray-50">
+                        <h3 className="text-lg font-medium">{item.service.title}</h3>
+                        <p>
+                          Usage: {item.service?.calls} / {item.maxCalls}
+                        </p>
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                          <div
+                            className="bg-blue-600 h-2.5 rounded-full"
+                            style={{
+                              width: `${(item.service.calls / item.maxCalls) * 100}%`,
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
+                <div className="bg-white p-6 rounded-lg shadow-lg">
+                  <h2 className="text-xl font-semibold mb-4">Redeem History</h2>
+                  <div className="space-y-4">
+                    {Object.entries(groupRedeemHistoryByService(redeemHistory)).map(
+                      ([serviceTitle, calls]) => (
+                        <div key={serviceTitle} className="p-4 border rounded-lg bg-gray-50">
+                          <h3 className="text-lg font-medium">{serviceTitle}</h3>
+                          {calls.map((item, index) => (
+                            <div key={index} className="ml-4">
+                              <p>
+                                Call {index + 1}: Date:{" "}
+                                {new Date(item.date).toLocaleDateString()}, Time:{" "}
+                                {new Date(item.date).toLocaleTimeString()}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <Plans />
+            )}
+          </>
+        );
+
+      case "orderHistory":
+        return <OrderHistory />;
+      case "profile":
+        return <Profile />;
+      case "services":
+        return <Plans />;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-[80%]">
-      <h1 className="text-3xl font-semibold mb-6">Resume Writing Services</h1>
-      <form className="space-y-6">        
-        <div>
-          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-            Full Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-          />
-        </div>
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email Address <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            // onChange={handleChange}
-            disabled={true}
-            required
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-          />
-        </div>
-        <div>
-          <label htmlFor="linkedIn" className="block text-sm font-medium text-gray-700">
-            LinkedIn Profile
-          </label>
-          <input
-            type="text"
-            id="linkedIn"
-            name="linkedIn"
-            value={formData.linkedIn}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-          />
-        </div>
-        <div className="flex items-center">
-          <select
-            name="countryCode"
-            value={formData.countryCode || '+91'} // Default to India code
-            onChange={handleCountryCodeChange}
-            className="appearance-none border border-gray-300 rounded-md py-2 px-4 mr-2"
-          >
-            <option value="+1">+1 (USA)</option>
-            <option value="+91">+91 (India)</option>
-            {/* Add more country codes as needed */}
-          </select>
-          <input
-            type="tel"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            maxLength={formData.countryCode === '+1' ? 10 : 12} // Adjust max length based on country code
-            pattern="[0-9]*" // Allow only numeric input
-            className="border border-gray-300 rounded-md py-2 px-4 w-full"
-            placeholder="Enter phone number"
-          />
-        </div>
-        <div>
-          <label htmlFor="specialization" className="block text-sm font-medium text-gray-700">
-            What is your area of specialization? <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="specialization"
-            name="specialization"
-            value={formData.specialization}
-            onChange={handleChange}
-            required
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-          >
-            <option value="">Select specialization</option>
-            <option value="Product">Product</option>
-            <option value="Marketing & Sales">Marketing & Sales</option>
-            <option value="Engineering">Engineering</option>
-            <option value="Senior Management">Senior Management</option>
-            <option value="Others">Others</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="resume" className="block text-sm font-medium text-gray-700">
-            Upload your resume <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="file"
-            id="file"
-            name="file"
-            onChange={handleResumeChange}
-            required
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-          />
-        </div>
-        <div>
-          <label htmlFor="experience" className="block text-sm font-medium text-gray-700">
-            Years of Work Experience <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="experience"
-            name="experience"
-            value={formData.experience}
-            onChange={handleChange}
-            required
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-          >
-            <option value="">Select years of experience</option>
-            <option value="0 to 2 Years">0 to 2 Years</option>
-            <option value="2 to 5 Years">2 to 5 Years</option>
-            <option value="5 to 10 Years">5 to 10 Years</option>
-            <option value="10 Years and above">10 Years and above</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="education" className="block text-sm font-medium text-gray-700">
-            Highest Education <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="education"
-            name="education"
-            value={formData.education}
-            onChange={handleChange}
-            required
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-          >
-            <option value="">Select highest education</option>
-            <option value="Diploma">Diploma</option>
-            <option value="Bachelors">Bachelors</option>
-            <option value="Masters">Masters</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        {formData.education === 'Other' && (
-          <div>
-            <label htmlFor="otherEducation" className="block text-sm font-medium text-gray-700">
-              Other Education
-            </label>
-            <input
-              type="text"
-              id="otherEducation"
-              name="otherEducation"
-              value={formData.otherEducation}
-              onChange={handleChange}
-              className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-            />
-          </div>
-        )}
-        <div>
-          <label htmlFor="organization" className="block text-sm font-medium text-gray-700">
-            Current Organization <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="organization"
-            name="organization"
-            value={formData.organization}
-            onChange={handleChange}
-            required
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Preferred contact method <span className="text-red-500">*</span>
-          </label>
-          <div className="mt-1">
-            <label className="inline-flex items-center">
-              <input
-                type="radio"
-                name="contactMethod"
-                value="Phone"
-                onChange={handleChange}
-                required
-                className="form-radio h-4 w-4 text-indigo-600"
-              />
-              <span className="ml-2">Phone</span>
-            </label>
-            <label className="inline-flex items-center ml-6">
-              <input
-                type="radio"
-                name="contactMethod"
-                value="Email"
-                onChange={handleChange}
-                required
-                className="form-radio h-4 w-4 text-indigo-600"
-              />
-              <span className="ml-2">Email</span>
-            </label>
-          </div>
-        </div>
-        <div>
-          <label htmlFor="additionalInfo" className="block text-sm font-medium text-gray-700">
-            Any other requests, comments or information you would like to give us?
-          </label>
-          <textarea
-            id="additionalInfo"
-            name="additionalInfo"
-            value={formData.additionalInfo}
-            onChange={handleChange}
-            rows="3"
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-          ></textarea>
-        </div>
-        <div>
-          <label htmlFor="referralSource" className="block text-sm font-medium text-gray-700">
-            Where did you hear about us? <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="referralSource"
-            name="referralSource"
-            value={formData.referralSource}
-            onChange={handleChange}
-            required
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-            />
-          </div>
-        
-        <div className="flex justify-center">
-          <button onClick={handleNext}>
-          <Link to="/plans"
-            className="px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-          >
-            Next
-          </Link>
-          </button>
-        </div>
-      </form>
+    <div className="min-h-screen bg-gray-100 flex margins">
+      <div className="fixed left-0">
+        <Sidebar setCurrentView={setCurrentView} />
+      </div>
+      <div className="w-full p-6 lg:ml-64">{renderContent()}</div>
     </div>
   );
 };
 
-export default FormPage;
+export default Dashboard;
+
+

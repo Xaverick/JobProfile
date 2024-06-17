@@ -9,7 +9,8 @@ const mongoose = require("mongoose");
 const cookieParser = require('cookie-parser');
 const expressError = require("./utils/ExpressError");
 const passport = require('passport');
-
+const path = require('path');
+require("./utils/crons");
 
 
 const DB_URL = process.env.DB_URL;
@@ -20,12 +21,14 @@ db.once("open", () => {
     console.log("Database connected")
 });
 
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname,'views'))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: ["http://localhost:5173", "http://localhost:5174", process.env.SITE_URL, process.env.ADMIN_URL],
     credentials: true
 }));
 app.use(passport.initialize()); 

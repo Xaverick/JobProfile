@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+
 const userSchema = new Schema({
 
     name: {
@@ -13,12 +14,15 @@ const userSchema = new Schema({
     },
 
     picture: {
-        type: String
+        type: String,
+        default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png'
+
     }, 
 
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
 
     password: {
@@ -30,21 +34,18 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Profile'
     },
-    plan: {
-        type: String,
+    
+    currentPlan: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'userPlanStatus'
+        }
+    ],
 
-    },
-    amount: {
-        type: Number,
-    },
 
-    paymentId: {
-        type: String
-    },
 
 });
 
 
+
 module.exports = mongoose.model('User', userSchema);
-
-

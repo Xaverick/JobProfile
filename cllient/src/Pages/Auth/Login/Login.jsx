@@ -6,8 +6,10 @@ import { useDispatch } from 'react-redux';
 import { login } from '../../../store/slices/authSlice';
 import axios from 'axios';
 import { FcGoogle } from "react-icons/fc";
+import Loader from '../../../components/Loader/Loader';
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
 
   const Navigate = useNavigate();
   const googleAuth = () => {
@@ -84,6 +86,7 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();  
     try {
+      setLoading(true);
       const response = await axios.post('/user/login', {
         email,
         password
@@ -105,15 +108,19 @@ const Login = () => {
           autoClose: 2000,
           hideProgressBar: true,
         });
+        setLoading(false);
         setEmail('');
         setPassword('');
         setTimeout(() => {
           Navigate('/dashboard');
         }, 1000);
+
       } else {
+        setLoading(false);
         throw new Error('Login failed');
       }
     } catch (error) {
+      setLoading(false);
       toast.error(`${error.response.data}`, {
         position: "top-left",
         autoClose: 2000,
@@ -124,6 +131,7 @@ const Login = () => {
 
   return (
     <div className="login-container">
+      {loading && <Loader loading={loading} message={'Logging in...'}/>}
       <form onSubmit={handleSubmit} className="login-form">
         <h2>Login</h2>
         <p>Enter your email below to login to your account</p>
@@ -158,9 +166,11 @@ const Login = () => {
         </a>   
         <div className='auth-link'>
           <Link to="/signup" className="signup">
-            Already have an account? Signup
+            Don&apos;t have an account? Signup
           </Link>
-
+          <Link to="/forgotpassword" className="signup">
+            Forgot Password? Click here to reset
+          </Link>
         </div>
       </form>
 

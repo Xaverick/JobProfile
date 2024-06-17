@@ -9,7 +9,7 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 router.get('/google/callback', passport.authenticate('google',  { 
     scope: ['profile', 'email'],
-    failureRedirect: '/http://localhost:5173/login',
+    failureRedirect: `${process.env.SITE_URL}/login`,
     session: false
 }, ), catchAsync(authController.googleCallback));
 

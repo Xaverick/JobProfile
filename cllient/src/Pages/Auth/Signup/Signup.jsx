@@ -4,8 +4,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import {  toast } from 'react-toastify';
 import axios from 'axios';
 import { FcGoogle } from "react-icons/fc";
+import Loader from '../../../components/Loader/Loader';
 
 const Signup = () => {
+
+  const [loading, setLoading] = useState(false);
 
   const googleAuth = () => {
     
@@ -37,6 +40,7 @@ const Signup = () => {
     event.preventDefault();
   
     try {
+      setLoading(true);
       const response = await axios.post('/user/register', formData, {
         headers: {
           'Content-Type': 'application/json'
@@ -55,11 +59,14 @@ const Signup = () => {
           password: '',
           name: '',
         });
+
+        setLoading(false);
   
         setTimeout(() => {
           Navigate('/login');
         }, 1000);
       } else {
+        setLoading(false);
         toast.error('Signup failed', {
           position: "top-left",
           autoClose: 2000,
@@ -67,6 +74,7 @@ const Signup = () => {
         });
       }
     } catch (error) {
+      setLoading(false);
       console.error('Error during signup:', error);
       toast.error(`${error.response.data}`, {
         position: "top-left",
@@ -78,6 +86,7 @@ const Signup = () => {
 
   return (
     <div className="signup-container">
+      {loading && <Loader loading={loading} message={'Signing up...'}/>}
       <form onSubmit={handleSubmit} className="signup-form">
         <h2>SignUp With Us !</h2>
         <p>Fill in the details below to create an account</p>
@@ -138,3 +147,4 @@ const Signup = () => {
 };
 
 export default Signup;
+

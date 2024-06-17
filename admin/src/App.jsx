@@ -7,7 +7,8 @@ import Login from './Pages/Auth/Login/Login'
 import Category from './Pages/Category/Category';
 import PrivateRoutes from './utils/PrivateRoutes';
 import Home from './Pages/Home/Home';
-import Upload from './Pages/Upload/Upload';
+import CreatePlan from './Pages/CreatePlan/CreatePlan';
+import PlanStatus from './Pages/PlanStatus/PlanStatus';
 
 function App() {
 
@@ -17,16 +18,16 @@ function App() {
       <ToastContainer />
       <Navbar />
 
-
       <Routes>
         <Route path="/login" element={<Login />} /> 
 
         <Route element={<PrivateRoutes />} >
           <Route path="/" element={<Home />} />
           <Route path="/categories" element={<Category />} />
-          <Route path="/upload" element={<Upload />} />
+          <Route path="/createplan" element={<CreatePlan />} /> 
+          <Route path="/planstatus/:userId" element={<PlanStatus />} />
         </Route> 
-      </Routes>
+      </Routes> 
 
 
 
