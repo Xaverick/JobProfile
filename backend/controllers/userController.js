@@ -69,11 +69,15 @@ module.exports.login = async (req, res) => {
 
 module.exports.logout = async (req, res) => {
     console.log("In Logout");
+    // res.clearCookie('userjwt', {
+    //     signed: true,
+    //     httpOnly: true,
+    //     sameSite: 'none',
+    //     secure: true
+    // });
     res.clearCookie('userjwt', {
         signed: true,
         httpOnly: true,
-        sameSite: 'none',
-        secure: true
     });
     res.status(200).json({ message: "Logged out successfully" });
 }
