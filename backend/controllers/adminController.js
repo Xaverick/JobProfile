@@ -47,7 +47,7 @@ module.exports.login = async (req, res) => {
     }
     const token = jwt.sign({ id: admin._id }, process.env.ADMIN_SECRET, { expiresIn: '3h'});
     // res.cookie('adminjwt', token, { signed: true, httpOnly: true, sameSite: 'none', maxAge: 1000 * 60 * 60* 3, secure: true })
-    res.cookie('adminjwt', {token : token, expiresIn: new Date(Date.now() + 3 * 60 * 60 * 1000)}, { signed: true, maxAge: 1000 * 60 * 60 * 3, httpOnly: true}); 
+    res.cookie('adminjwt', token, { signed: true, maxAge: 1000 * 60 * 60 * 3, httpOnly: true}); 
     const payload = { adminId: admin._id, email: admin.email, username: admin.username };
     res.status(200).json({ payload, expiresIn: 1000 * 60 * 60* 3});
     
